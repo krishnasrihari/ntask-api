@@ -27,9 +27,19 @@ module.exports = (sequelize, DataType) => {
                 notEmpty: true
             }
         }
+    }, {
+        hooks: {
+            beforeCreate: (user, options) => {
+                const salt = bcrypt.genSaltSync();
+                user.password = bcrypt.hashSync(user.password, salt);
+            }
+        }
     });
     Users.associate = (models) => {
         Users.hasMany(models.Tasks);
     };
+    Users.isPassword = (encodedPassword, password) => {
+        return bcrypt.compareSync(password, encodedPassword);
+    }
     return Users;
 };
